@@ -1,4 +1,4 @@
-package com.school.models;
+package com.school.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -12,18 +12,15 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Teacher {
+public class Subject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String firstName;
-    private String lastName;
     @Column(unique = true)
-    private String email;
-    private String phone;
-    private String teachingSubject;
+    private String name;
+    private String description;
 
-    @OneToMany(mappedBy = "teacher")
+    @ManyToMany(mappedBy = "subjects")
     @EqualsAndHashCode.Exclude
-    private Set<Lesson> lessons = new HashSet<>();
+    private Set<Course> courses = new HashSet<>();
 }

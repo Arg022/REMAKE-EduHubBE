@@ -1,4 +1,4 @@
-package com.school.models;
+package com.school.model;
 
 import com.school.enums.Role;
 import jakarta.persistence.*;
