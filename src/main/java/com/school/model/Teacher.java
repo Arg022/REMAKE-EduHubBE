@@ -1,6 +1,7 @@
 package com.school.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -16,11 +17,22 @@ public class Teacher {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @NotBlank(message = "First name cannot be blank")
     private String firstName;
+
+    @NotBlank(message = "Last name cannot be blank")
     private String lastName;
+
     @Column(unique = true)
+    @Email(message = "Email should be valid")
+    @NotBlank(message = "Email cannot be blank")
     private String email;
+
+    @NotBlank(message = "Phone cannot be blank")
     private String phone;
+
+    @NotBlank(message = "Teaching subject cannot be blank")
     private String teachingSubject;
 
     @OneToMany(mappedBy = "teacher")

@@ -1,6 +1,7 @@
 package com.school.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -17,10 +18,20 @@ public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(unique = true)
+    @NotBlank(message = "Course name cannot be blank")
     private String name;
+
+    @NotBlank(message = "Description cannot be blank")
     private String description;
+
+    @NotNull(message = "Duration is required")
+    @Min(value = 1, message = "Duration must be at least 1 hour")
     private Integer durationHours;
+
+    @NotNull(message = "Cost is required")
+    @DecimalMin(value = "0.0", inclusive = false, message = "Cost must be greater than 0")
     private BigDecimal cost;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)

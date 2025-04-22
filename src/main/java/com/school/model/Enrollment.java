@@ -1,6 +1,7 @@
 package com.school.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -15,16 +16,21 @@ public class Enrollment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "Student is required")
     @ManyToOne
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
 
+    @NotNull(message = "Course is required")
     @ManyToOne
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
 
+    @NotNull(message = "Enrollment date is required")
     private LocalDate enrollmentDate;
-    private String status; // E.g., "Active", "Completed", "Withdrawn"
+
+    @NotBlank(message = "Status cannot be blank")
+    private String status;
 
     @OneToOne(mappedBy = "enrollment", cascade = CascadeType.ALL, orphanRemoval = true)
     private Evaluation evaluation;

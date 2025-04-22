@@ -1,6 +1,7 @@
 package com.school.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -16,8 +17,12 @@ public class Subject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(unique = true)
+    @NotBlank(message = "Subject name cannot be blank")
     private String name;
+
+    @NotBlank(message = "Description cannot be blank")
     private String description;
 
     @ManyToMany(mappedBy = "subjects")
