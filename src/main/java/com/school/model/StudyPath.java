@@ -1,5 +1,6 @@
 package com.school.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
@@ -25,6 +26,7 @@ public class StudyPath {
     @NotBlank(message = "Description cannot be blank")
     private String description;
 
+    @JsonManagedReference(value = "studypath-reference")
     @ManyToMany
     @JoinTable(
             name = "study_path_course",

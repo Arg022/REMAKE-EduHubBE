@@ -5,6 +5,8 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import java.time.LocalDate;
 
 @Entity
@@ -19,11 +21,15 @@ public class Enrollment {
     @NotNull(message = "Student is required")
     @ManyToOne
     @JoinColumn(name = "student_id", nullable = false)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Student student;
 
     @NotNull(message = "Course is required")
     @ManyToOne
     @JoinColumn(name = "course_id", nullable = false)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Course course;
 
     @NotNull(message = "Enrollment date is required")
