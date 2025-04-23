@@ -2,7 +2,9 @@ package com.school.service;
 
 import com.school.model.Student;
 import com.school.repository.StudentRepository;
-import jakarta.persistence.EntityNotFoundException;
+import com.school.exception.ResourceNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.poi.ss.usermodel.*;
@@ -18,6 +20,7 @@ import java.util.Optional;
 
 @Service
 public class StudentService {
+    private static final Logger logger = LoggerFactory.getLogger(StudentService.class);
 
     private final StudentRepository studentRepository;
 
@@ -27,35 +30,46 @@ public class StudentService {
     }
 
     public List<Student> getAllStudents() {
-        return studentRepository.findAll();
+        logger.info("Retrieving all students");
+        List<Student> students = studentRepository.findAll();
+        logger.debug("Found {} students", students.size());
+        return students;
     }
 
     public Student getStudentById(Long id) {
-        Optional<Student> student = studentRepository.findById(id);
-        if (student.isPresent()) {
-            return student.get();
-        } else {
-            throw new EntityNotFoundException("Student not found with id: " + id);
-        }
+        logger.info("Retrieving student with id: {}", id);
+        return studentRepository.findById(id)
+            .orElseThrow(() -> {
+                logger.error("Student not found with id: {}", id);
+                return new ResourceNotFoundException("Student", "id", id);
+            });
     }
 
     public Student saveStudent(Student student) {
-        return studentRepository.save(student);
+        logger.info("Saving new student: {}", student.getEmail());
+        Student savedStudent = studentRepository.save(student);
+        logger.debug("Student saved successfully with id: {}", savedStudent.getId());
+        return savedStudent;
     }
 
     public void deleteStudentById(Long id) {
+        logger.info("Attempting to delete student with id: {}", id);
         if (studentRepository.existsById(id)) {
             studentRepository.deleteById(id);
+            logger.debug("Student deleted successfully with id: {}", id);
         } else {
-            throw new EntityNotFoundException("Student not found with id: " + id);
+            logger.error("Failed to delete - student not found with id: {}", id);
+            throw new ResourceNotFoundException("Student", "id", id);
         }
     }
 
     public Student updateStudent(Long id, Student updatedStudent) {
+        logger.info("Attempting to update student with id: {}", id);
         Optional<Student> existingStudentOptional = studentRepository.findById(id);
 
         if (existingStudentOptional.isEmpty()) {
-            throw new EntityNotFoundException("Student not found with id: " + id);
+            logger.error("Failed to update - student not found with id: {}", id);
+            throw new ResourceNotFoundException("Student", "id", id);
         }
 
         Student existingStudent = existingStudentOptional.get();
@@ -68,7 +82,9 @@ public class StudentService {
         existingStudent.setTaxCode(updatedStudent.getTaxCode());
         existingStudent.setRegistrationDate(updatedStudent.getRegistrationDate());
 
-        return studentRepository.save(existingStudent);
+        Student savedStudent = studentRepository.save(existingStudent);
+        logger.debug("Student updated successfully with id: {}", savedStudent.getId());
+        return savedStudent;
     }
 
     public ByteArrayInputStream exportToCSV() {
