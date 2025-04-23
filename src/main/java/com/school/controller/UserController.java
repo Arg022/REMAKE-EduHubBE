@@ -62,6 +62,7 @@ public class UserController {
 
     @Operation(summary = "Register a new user", description = "Register a new user with encrypted password")
     @PostMapping("/register")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserDTO> registerUser(@RequestBody Users user) {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         user.setPassword(passwordEncoder.encode(user.getPassword()));
