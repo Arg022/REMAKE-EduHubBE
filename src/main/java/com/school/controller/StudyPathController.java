@@ -13,6 +13,7 @@ import java.util.List;
 @Tag(name = "Study Paths", description = "Endpoints for managing study paths")
 @RestController
 @RequestMapping("/study-paths")
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class StudyPathController {
 
     private final StudyPathService studyPathService;
