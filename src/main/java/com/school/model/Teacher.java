@@ -18,6 +18,12 @@ public class Teacher {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "User account is required")
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @EqualsAndHashCode.Exclude
+    private Users user;
+
     @NotBlank(message = "First name cannot be blank")
     private String firstName;
 
