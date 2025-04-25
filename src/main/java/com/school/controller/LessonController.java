@@ -2,10 +2,11 @@ package com.school.controller;
 
 import com.school.model.Lesson;
 import com.school.dto.LessonDTO;
+import com.school.dto.CreateLessonDTO;
 import com.school.service.LessonService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,6 @@ public class LessonController {
 
     private final LessonService lessonService;
 
-    @Autowired
     public LessonController(LessonService lessonService) {
         this.lessonService = lessonService;
     }
@@ -62,16 +62,16 @@ public class LessonController {
     @Operation(summary = "Create a new lesson", description = "Add a new lesson to the system")
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('TEACHER')")
-    public ResponseEntity<LessonDTO> createLesson(@RequestBody Lesson lesson) {
-        Lesson savedLesson = lessonService.saveLesson(lesson);
+    public ResponseEntity<LessonDTO> createLesson(@Valid @RequestBody CreateLessonDTO createLessonDTO) {
+        Lesson savedLesson = lessonService.saveLesson(createLessonDTO);
         return ResponseEntity.ok(convertToDTO(savedLesson));
     }
 
     @Operation(summary = "Update a lesson", description = "Update the details of an existing lesson")
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('TEACHER')")
-    public ResponseEntity<LessonDTO> updateLesson(@PathVariable Long id, @RequestBody Lesson lesson) {
-        Lesson updatedLesson = lessonService.updateLesson(id, lesson);
+    public ResponseEntity<LessonDTO> updateLesson(@PathVariable Long id, @Valid @RequestBody CreateLessonDTO createLessonDTO) {
+        Lesson updatedLesson = lessonService.updateLesson(id, createLessonDTO);
         return ResponseEntity.ok(convertToDTO(updatedLesson));
     }
 

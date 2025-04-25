@@ -40,7 +40,7 @@ public class EvaluationController {
 
     @Operation(summary = "Get all evaluations", description = "Retrieve a list of all evaluations")
     @GetMapping
-    @PreAuthorize("hasRole('TEACHER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('STUDENT') or hasRole('TEACHER') or hasRole('ADMIN')")
     public ResponseEntity<List<EvaluationDTO>> getAllEvaluations() {
         List<EvaluationDTO> evaluationDTOs = evaluationService.getAllEvaluations()
             .stream()

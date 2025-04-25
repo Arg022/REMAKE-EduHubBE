@@ -1,11 +1,12 @@
 package com.school.controller;
 
+import com.school.dto.CreateStudentDTO;
 import com.school.dto.StudentDTO;
 import com.school.model.Student;
 import com.school.service.StudentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -25,7 +26,6 @@ public class StudentController {
 
     private final StudentService studentService;
 
-    @Autowired
     public StudentController(StudentService studentService) {
         this.studentService = studentService;
     }
@@ -61,8 +61,8 @@ public class StudentController {
     @Operation(summary = "Create a new student", description = "Add a new student to the system")
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<StudentDTO> createStudent(@RequestBody Student student) {
-        Student savedStudent = studentService.saveStudent(student);
+    public ResponseEntity<StudentDTO> createStudent(@Valid @RequestBody CreateStudentDTO createStudentDTO) {
+        Student savedStudent = studentService.saveStudent(createStudentDTO);
         return ResponseEntity.ok(convertToDTO(savedStudent));
     }
 

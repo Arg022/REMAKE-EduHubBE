@@ -2,10 +2,11 @@ package com.school.controller;
 
 import com.school.model.Enrollment;
 import com.school.dto.EnrollmentDTO;
+import com.school.dto.CreateEnrollmentDTO;
 import com.school.service.EnrollmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,6 @@ public class EnrollmentController {
 
     private final EnrollmentService enrollmentService;
 
-    @Autowired
     public EnrollmentController(EnrollmentService enrollmentService) {
         this.enrollmentService = enrollmentService;
     }
@@ -40,7 +40,7 @@ public class EnrollmentController {
 
     @Operation(summary = "Get all enrollments", description = "Retrieve a list of all enrollments")
     @GetMapping
-    @PreAuthorize("hasRole('TEACHER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('STUDENT') or hasRole('TEACHER') or hasRole('ADMIN')")
     public ResponseEntity<List<EnrollmentDTO>> getAllEnrollments() {
         List<EnrollmentDTO> enrollmentDTOs = enrollmentService.getAllEnrollments()
             .stream()
@@ -60,16 +60,16 @@ public class EnrollmentController {
     @Operation(summary = "Create a new enrollment", description = "Add a new enrollment to the system")
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('STUDENT')")
-    public ResponseEntity<EnrollmentDTO> createEnrollment(@RequestBody Enrollment enrollment) {
-        Enrollment savedEnrollment = enrollmentService.saveEnrollment(enrollment);
+    public ResponseEntity<EnrollmentDTO> createEnrollment(@Valid @RequestBody CreateEnrollmentDTO createEnrollmentDTO) {
+        Enrollment savedEnrollment = enrollmentService.saveEnrollment(createEnrollmentDTO);
         return ResponseEntity.ok(convertToDTO(savedEnrollment));
     }
 
     @Operation(summary = "Update an enrollment", description = "Update the details of an existing enrollment")
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<EnrollmentDTO> updateEnrollment(@PathVariable Long id, @RequestBody Enrollment enrollment) {
-        Enrollment updatedEnrollment = enrollmentService.updateEnrollment(id, enrollment);
+    public ResponseEntity<EnrollmentDTO> updateEnrollment(@PathVariable Long id, @Valid @RequestBody CreateEnrollmentDTO createEnrollmentDTO) {
+        Enrollment updatedEnrollment = enrollmentService.updateEnrollment(id, createEnrollmentDTO);
         return ResponseEntity.ok(convertToDTO(updatedEnrollment));
     }
 
