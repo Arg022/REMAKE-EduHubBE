@@ -32,6 +32,7 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/h2-console/**",
                     "/auth/login",
+                    "/auth/register",
                     "/v3/api-docs/**",
                     "/swagger-ui/**",
                     "/swagger-ui.html"
@@ -51,7 +52,7 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
-    @Bean
+    @Bean 
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
