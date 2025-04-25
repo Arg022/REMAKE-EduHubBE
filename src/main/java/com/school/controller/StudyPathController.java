@@ -2,19 +2,16 @@ package com.school.controller;
 
 import com.school.model.StudyPath;
 import com.school.dto.StudyPathDTO;
-import com.school.dto.CourseDTO;
 import com.school.service.StudyPathService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.HashSet;
 
 @Tag(name = "Study Paths", description = "Endpoints for managing study paths")
 @RestController
@@ -24,27 +21,16 @@ public class StudyPathController {
 
     private final StudyPathService studyPathService;
 
-    @Autowired
     public StudyPathController(StudyPathService studyPathService) {
         this.studyPathService = studyPathService;
     }
 
     private StudyPathDTO convertToDTO(StudyPath studyPath) {
-        Set<CourseDTO> courseDTOs = studyPath.getCourses().stream()
-            .map(course -> new CourseDTO(
-                course.getId(),
-                course.getName(),
-                course.getDescription(),
-                course.getDurationHours(),
-                course.getCost()
-            ))
-            .collect(Collectors.toSet());
-
         return new StudyPathDTO(
             studyPath.getId(),
             studyPath.getName(),
             studyPath.getDescription(),
-            courseDTOs
+            studyPath.getDuration()
         );
     }
 
@@ -70,7 +56,7 @@ public class StudyPathController {
     @Operation(summary = "Create a new study path", description = "Add a new study path to the system")
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<StudyPathDTO> createStudyPath(@RequestBody StudyPath studyPath) {
+    public ResponseEntity<StudyPathDTO> createStudyPath(@Valid @RequestBody StudyPath studyPath) {
         StudyPath savedStudyPath = studyPathService.saveStudyPath(studyPath);
         return ResponseEntity.ok(convertToDTO(savedStudyPath));
     }
@@ -78,7 +64,7 @@ public class StudyPathController {
     @Operation(summary = "Update a study path", description = "Update the details of an existing study path")
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<StudyPathDTO> updateStudyPath(@PathVariable Long id, @RequestBody StudyPath studyPath) {
+    public ResponseEntity<StudyPathDTO> updateStudyPath(@PathVariable Long id, @Valid @RequestBody StudyPath studyPath) {
         StudyPath updatedStudyPath = studyPathService.updateStudyPath(id, studyPath);
         return ResponseEntity.ok(convertToDTO(updatedStudyPath));
     }
