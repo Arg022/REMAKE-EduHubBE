@@ -1,0 +1,11 @@
+com\school\model\EnrollmentTest.class
+com\school\model\SubjectTest.class
+com\school\model\TeacherTest.class
+com\school\model\CourseTest.class
+com\school\model\EvaluationTest.class
+com\school\model\UsersTest.class
+com\school\model\StudentTest.class
+com\school\model\LessonTest.class
+com\school\model\ClassroomTest.class
+com\school\model\StudyPathTest.class
+com\school\ScuolaApplicationTests.class
