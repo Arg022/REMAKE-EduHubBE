@@ -2,10 +2,11 @@ package com.school.controller;
 
 import com.school.model.Teacher;
 import com.school.dto.TeacherDTO;
+import com.school.dto.CreateTeacherDTO;
 import com.school.service.TeacherService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,6 @@ public class TeacherController {
 
     private final TeacherService teacherService;
 
-    @Autowired
     public TeacherController(TeacherService teacherService) {
         this.teacherService = teacherService;
     }
@@ -58,8 +58,8 @@ public class TeacherController {
     @Operation(summary = "Create a new teacher", description = "Add a new teacher to the system")
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<TeacherDTO> createTeacher(@RequestBody Teacher teacher) {
-        Teacher savedTeacher = teacherService.saveTeacher(teacher);
+    public ResponseEntity<TeacherDTO> createTeacher(@Valid @RequestBody CreateTeacherDTO createTeacherDTO) {
+        Teacher savedTeacher = teacherService.saveTeacher(createTeacherDTO);
         return ResponseEntity.ok(convertToDTO(savedTeacher));
     }
 
