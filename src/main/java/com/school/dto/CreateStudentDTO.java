@@ -29,7 +29,7 @@ public class CreateStudentDTO {
     private String address;
     
     @NotBlank(message = "Tax code cannot be blank")
-    private String taxCode;
+    private String code;
     
     @NotNull(message = "Study path ID is required")
     private Long studyPathId;
