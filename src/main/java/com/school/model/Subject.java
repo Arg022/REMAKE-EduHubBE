@@ -1,6 +1,6 @@
 package com.school.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
@@ -26,8 +26,8 @@ public class Subject {
     @NotBlank(message = "Description cannot be blank")
     private String description;
 
-    @JsonManagedReference(value = "subject-reference")
     @ManyToMany(mappedBy = "subjects")
+    @JsonIgnoreProperties("subjects")
     @EqualsAndHashCode.Exclude
     private Set<Course> courses = new HashSet<>();
 }

@@ -1,6 +1,6 @@
 package com.school.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
@@ -43,18 +43,18 @@ public class Course {
     @EqualsAndHashCode.Exclude
     private Set<Lesson> lessons = new HashSet<>();
 
-    @JsonBackReference(value = "subject-reference")
     @ManyToMany
     @JoinTable(
             name = "course_subject",
             joinColumns = @JoinColumn(name = "course_id"),
             inverseJoinColumns = @JoinColumn(name = "subject_id")
     )
+    @JsonIgnoreProperties("courses")
     @EqualsAndHashCode.Exclude
     private Set<Subject> subjects = new HashSet<>();
 
-    @JsonBackReference(value = "studypath-reference")
     @ManyToMany(mappedBy = "courses")
+    @JsonIgnoreProperties("courses")
     @EqualsAndHashCode.Exclude
     private Set<StudyPath> studyPaths = new HashSet<>();
 }

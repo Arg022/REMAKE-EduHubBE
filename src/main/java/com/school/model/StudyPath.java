@@ -1,6 +1,6 @@
 package com.school.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
@@ -26,13 +26,13 @@ public class StudyPath {
     @NotBlank(message = "Description cannot be blank")
     private String description;
 
-    @JsonManagedReference(value = "studypath-reference")
     @ManyToMany
     @JoinTable(
             name = "study_path_course",
             joinColumns = @JoinColumn(name = "study_path_id"),
             inverseJoinColumns = @JoinColumn(name = "course_id")
     )
+    @JsonIgnoreProperties("studyPaths")
     @EqualsAndHashCode.Exclude
     private Set<Course> courses = new HashSet<>();
 }
