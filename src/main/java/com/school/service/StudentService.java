@@ -68,7 +68,7 @@ public class StudentService {
         student.setEmail(createStudentDTO.getEmail());
         student.setPhone(createStudentDTO.getPhone());
         student.setAddress(createStudentDTO.getAddress());
-        student.setTaxCode(createStudentDTO.getTaxCode());
+        student.setCode(createStudentDTO.getCode());
         student.setRegistrationDate(LocalDate.now());
         student.setEnrollments(new HashSet<>());
         
@@ -98,14 +98,17 @@ public class StudentService {
         }
 
         Student existingStudent = existingStudentOptional.get();
+        LocalDate originalRegistrationDate = existingStudent.getRegistrationDate();
+        
         existingStudent.setFirstName(updatedStudent.getFirstName());
         existingStudent.setLastName(updatedStudent.getLastName());
         existingStudent.setDateOfBirth(updatedStudent.getDateOfBirth());
         existingStudent.setEmail(updatedStudent.getEmail());
         existingStudent.setPhone(updatedStudent.getPhone());
         existingStudent.setAddress(updatedStudent.getAddress());
-        existingStudent.setTaxCode(updatedStudent.getTaxCode());
-        existingStudent.setRegistrationDate(updatedStudent.getRegistrationDate());
+        existingStudent.setCode(updatedStudent.getCode());
+        // Restore the original registration date
+        existingStudent.setRegistrationDate(originalRegistrationDate);
 
         Student savedStudent = studentRepository.save(existingStudent);
         logger.debug("Student updated successfully with id: {}", savedStudent.getId());

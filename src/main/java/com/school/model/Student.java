@@ -47,7 +47,7 @@ public class Student {
 
     @Column(unique = true)
     @NotBlank(message = "Tax code cannot be blank")
-    private String taxCode;
+    private String code;
 
     @NotNull(message = "Registration date is required")
     private LocalDate registrationDate;

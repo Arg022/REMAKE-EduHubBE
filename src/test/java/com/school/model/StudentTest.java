@@ -35,7 +35,7 @@ class StudentTest {
         student.setEmail("john.doe@example.com");
         student.setPhone("1234567890");
         student.setAddress("123 Main St");
-        student.setTaxCode("ABCDEF12G34H567I");
+        student.setCode("ABCDEF12G34H567I");
         student.setRegistrationDate(LocalDate.now());
     }
 
@@ -100,7 +100,7 @@ class StudentTest {
 
     @Test
     void whenTaxCodeIsBlank_shouldHaveViolation() {
-        student.setTaxCode("");
+        student.setCode("");
         var violations = validator.validate(student);
         assertFalse(violations.isEmpty());
         assertEquals(1, violations.size());
