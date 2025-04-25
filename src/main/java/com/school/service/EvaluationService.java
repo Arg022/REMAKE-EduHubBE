@@ -1,7 +1,9 @@
 package com.school.service;
 
 import com.school.model.Evaluation;
+import com.school.model.Enrollment;
 import com.school.repository.EvaluationRepository;
+import com.school.repository.EnrollmentRepository;
 import com.school.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,10 +18,12 @@ public class EvaluationService {
     private static final Logger logger = LoggerFactory.getLogger(EvaluationService.class);
 
     private final EvaluationRepository evaluationRepository;
+    private final EnrollmentRepository enrollmentRepository;
 
     @Autowired
-    public EvaluationService(EvaluationRepository evaluationRepository) {
+    public EvaluationService(EvaluationRepository evaluationRepository, EnrollmentRepository enrollmentRepository) {
         this.evaluationRepository = evaluationRepository;
+        this.enrollmentRepository = enrollmentRepository;
     }
 
     public List<Evaluation> getAllEvaluations() {
@@ -66,10 +70,16 @@ public class EvaluationService {
         }
 
         Evaluation existingEvaluation = existingEvaluationOptional.get();
+        
+        Enrollment enrollment = enrollmentRepository.findByIdWithDetails(updatedEvaluation.getEnrollment().getId());
+        if (enrollment == null) {
+            throw new ResourceNotFoundException("Enrollment", "id", updatedEvaluation.getEnrollment().getId());
+        }
+
         existingEvaluation.setGrade(updatedEvaluation.getGrade());
         existingEvaluation.setEvaluationDate(updatedEvaluation.getEvaluationDate());
         existingEvaluation.setNotes(updatedEvaluation.getNotes());
-        existingEvaluation.setEnrollment(updatedEvaluation.getEnrollment());
+        existingEvaluation.setEnrollment(enrollment);
 
         Evaluation savedEvaluation = evaluationRepository.save(existingEvaluation);
         logger.debug("Evaluation updated successfully with id: {}", savedEvaluation.getId());
