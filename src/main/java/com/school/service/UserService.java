@@ -43,7 +43,6 @@ public class UserService {
 
     public Users saveUser(Users user) {
         logger.info("Saving new user: {}", user.getUsername());
-        // Encode password if it's not already encoded
         if (user.getPassword() != null && !user.getPassword().startsWith("$2a$")) {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
@@ -74,7 +73,6 @@ public class UserService {
 
         Users existingUser = existingUserOptional.get();
         existingUser.setUsername(updatedUser.getUsername());
-        // Only update password if a new one is provided
         if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
             existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
         }
@@ -83,5 +81,9 @@ public class UserService {
         Users savedUser = userRepository.save(existingUser);
         logger.debug("User updated successfully with id: {}", savedUser.getId());
         return savedUser;
+    }
+
+    public boolean existsByUsername(String username) {
+        return userRepository.findByUsername(username).isPresent();
     }
 }

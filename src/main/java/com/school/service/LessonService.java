@@ -1,11 +1,14 @@
 package com.school.service;
 
 import com.school.model.Lesson;
+import com.school.model.Course;
+import com.school.model.Teacher;
+import com.school.model.Classroom;
 import com.school.repository.LessonRepository;
+import com.school.dto.CreateLessonDTO;
 import com.school.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,10 +19,18 @@ public class LessonService {
     private static final Logger logger = LoggerFactory.getLogger(LessonService.class);
 
     private final LessonRepository lessonRepository;
+    private final CourseService courseService;
+    private final TeacherService teacherService;
+    private final ClassroomService classroomService;
 
-    @Autowired
-    public LessonService(LessonRepository lessonRepository) {
+    public LessonService(LessonRepository lessonRepository,
+                        CourseService courseService,
+                        TeacherService teacherService,
+                        ClassroomService classroomService) {
         this.lessonRepository = lessonRepository;
+        this.courseService = courseService;
+        this.teacherService = teacherService;
+        this.classroomService = classroomService;
     }
 
     public List<Lesson> getAllLessons() {
@@ -38,9 +49,23 @@ public class LessonService {
             });
     }
 
-    public Lesson saveLesson(Lesson lesson) {
-        logger.info("Saving new lesson for course {} with teacher {}", 
-            lesson.getCourse().getId(), lesson.getTeacher().getId());
+    public Lesson saveLesson(CreateLessonDTO createLessonDTO) {
+        logger.info("Creating new lesson for course {} with teacher {}", 
+            createLessonDTO.getCourseId(), createLessonDTO.getTeacherId());
+
+        // Fetch related entities
+        Course course = courseService.getCourseById(createLessonDTO.getCourseId());
+        Teacher teacher = teacherService.getTeacherById(createLessonDTO.getTeacherId());
+        Classroom classroom = classroomService.getClassroomById(createLessonDTO.getClassroomId());
+
+        // Create and save lesson
+        Lesson lesson = new Lesson();
+        lesson.setCourse(course);
+        lesson.setTeacher(teacher);
+        lesson.setClassroom(classroom);
+        lesson.setStartTime(createLessonDTO.getStartTime());
+        lesson.setEndTime(createLessonDTO.getEndTime());
+
         Lesson savedLesson = lessonRepository.save(lesson);
         logger.debug("Lesson saved successfully with id: {}", savedLesson.getId());
         return savedLesson;
@@ -57,7 +82,7 @@ public class LessonService {
         }
     }
 
-    public Lesson updateLesson(Long id, Lesson updatedLesson) {
+    public Lesson updateLesson(Long id, CreateLessonDTO createLessonDTO) {
         logger.info("Attempting to update lesson with id: {}", id);
         Optional<Lesson> existingLessonOptional = lessonRepository.findById(id);
 
@@ -66,12 +91,17 @@ public class LessonService {
             throw new ResourceNotFoundException("Lesson", "id", id);
         }
 
+        // Fetch related entities
+        Course course = courseService.getCourseById(createLessonDTO.getCourseId());
+        Teacher teacher = teacherService.getTeacherById(createLessonDTO.getTeacherId());
+        Classroom classroom = classroomService.getClassroomById(createLessonDTO.getClassroomId());
+
         Lesson existingLesson = existingLessonOptional.get();
-        existingLesson.setStartTime(updatedLesson.getStartTime());
-        existingLesson.setEndTime(updatedLesson.getEndTime());
-        existingLesson.setCourse(updatedLesson.getCourse());
-        existingLesson.setTeacher(updatedLesson.getTeacher());
-        existingLesson.setClassroom(updatedLesson.getClassroom());
+        existingLesson.setCourse(course);
+        existingLesson.setTeacher(teacher);
+        existingLesson.setClassroom(classroom);
+        existingLesson.setStartTime(createLessonDTO.getStartTime());
+        existingLesson.setEndTime(createLessonDTO.getEndTime());
 
         Lesson savedLesson = lessonRepository.save(existingLesson);
         logger.debug("Lesson updated successfully with id: {}", savedLesson.getId());

@@ -1,11 +1,13 @@
 package com.school.service;
 
 import com.school.model.Enrollment;
+import com.school.model.Student;
+import com.school.model.Course;
 import com.school.repository.EnrollmentRepository;
+import com.school.dto.CreateEnrollmentDTO;
 import com.school.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,10 +18,15 @@ public class EnrollmentService {
     private static final Logger logger = LoggerFactory.getLogger(EnrollmentService.class);
 
     private final EnrollmentRepository enrollmentRepository;
+    private final StudentService studentService;
+    private final CourseService courseService;
 
-    @Autowired
-    public EnrollmentService(EnrollmentRepository enrollmentRepository) {
+    public EnrollmentService(EnrollmentRepository enrollmentRepository,
+                           StudentService studentService,
+                           CourseService courseService) {
         this.enrollmentRepository = enrollmentRepository;
+        this.studentService = studentService;
+        this.courseService = courseService;
     }
 
     public List<Enrollment> getAllEnrollments() {
@@ -38,9 +45,19 @@ public class EnrollmentService {
             });
     }
 
-    public Enrollment saveEnrollment(Enrollment enrollment) {
-        logger.info("Saving new enrollment for student {} in course {}", 
-            enrollment.getStudent().getId(), enrollment.getCourse().getId());
+    public Enrollment saveEnrollment(CreateEnrollmentDTO createEnrollmentDTO) {
+        logger.info("Creating new enrollment for student {} in course {}", 
+            createEnrollmentDTO.getStudentId(), createEnrollmentDTO.getCourseId());
+        
+        Student student = studentService.getStudentById(createEnrollmentDTO.getStudentId());
+        Course course = courseService.getCourseById(createEnrollmentDTO.getCourseId());
+
+        Enrollment enrollment = new Enrollment();
+        enrollment.setStudent(student);
+        enrollment.setCourse(course);
+        enrollment.setEnrollmentDate(createEnrollmentDTO.getEnrollmentDate());
+        enrollment.setStatus(createEnrollmentDTO.getStatus());
+        
         Enrollment savedEnrollment = enrollmentRepository.save(enrollment);
         logger.debug("Enrollment saved successfully with id: {}", savedEnrollment.getId());
         return savedEnrollment;
@@ -57,7 +74,7 @@ public class EnrollmentService {
         }
     }
 
-    public Enrollment updateEnrollment(Long id, Enrollment updatedEnrollment) {
+    public Enrollment updateEnrollment(Long id, CreateEnrollmentDTO createEnrollmentDTO) {
         logger.info("Attempting to update enrollment with id: {}", id);
         Optional<Enrollment> existingEnrollmentOptional = enrollmentRepository.findById(id);
 
@@ -66,11 +83,14 @@ public class EnrollmentService {
             throw new ResourceNotFoundException("Enrollment", "id", id);
         }
 
+        Student student = studentService.getStudentById(createEnrollmentDTO.getStudentId());
+        Course course = courseService.getCourseById(createEnrollmentDTO.getCourseId());
+
         Enrollment existingEnrollment = existingEnrollmentOptional.get();
-        existingEnrollment.setStudent(updatedEnrollment.getStudent());
-        existingEnrollment.setCourse(updatedEnrollment.getCourse());
-        existingEnrollment.setEnrollmentDate(updatedEnrollment.getEnrollmentDate());
-        existingEnrollment.setStatus(updatedEnrollment.getStatus());
+        existingEnrollment.setStudent(student);
+        existingEnrollment.setCourse(course);
+        existingEnrollment.setEnrollmentDate(createEnrollmentDTO.getEnrollmentDate());
+        existingEnrollment.setStatus(createEnrollmentDTO.getStatus());
 
         Enrollment savedEnrollment = enrollmentRepository.save(existingEnrollment);
         logger.debug("Enrollment updated successfully with id: {}", savedEnrollment.getId());

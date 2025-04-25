@@ -1,6 +1,9 @@
 package com.school.service;
 
+import com.school.dto.CreateStudentDTO;
 import com.school.model.Student;
+import com.school.model.Users;
+import com.school.model.StudyPath;
 import com.school.repository.StudentRepository;
 import com.school.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
@@ -15,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,10 +28,13 @@ public class StudentService {
     private static final Logger logger = LoggerFactory.getLogger(StudentService.class);
 
     private final StudentRepository studentRepository;
+    private final UserService userService;
+    private final StudyPathService studyPathService;
 
-    @Autowired
-    public StudentService(StudentRepository studentRepository) {
+    public StudentService(StudentRepository studentRepository, UserService userService, StudyPathService studyPathService) {
         this.studentRepository = studentRepository;
+        this.userService = userService;
+        this.studyPathService = studyPathService;
     }
 
     public List<Student> getAllStudents() {
@@ -45,8 +53,25 @@ public class StudentService {
             });
     }
 
-    public Student saveStudent(Student student) {
-        logger.info("Saving new student: {}", student.getEmail());
+    public Student saveStudent(CreateStudentDTO createStudentDTO) {
+        logger.info("Creating new student with email: {}", createStudentDTO.getEmail());
+        
+        Users user = userService.getUserById(createStudentDTO.getUserId());
+        
+        studyPathService.getStudyPathById(createStudentDTO.getStudyPathId());
+        
+        Student student = new Student();
+        student.setUser(user);
+        student.setFirstName(createStudentDTO.getFirstName());
+        student.setLastName(createStudentDTO.getLastName());
+        student.setDateOfBirth(createStudentDTO.getDateOfBirth());
+        student.setEmail(createStudentDTO.getEmail());
+        student.setPhone(createStudentDTO.getPhone());
+        student.setAddress(createStudentDTO.getAddress());
+        student.setTaxCode(createStudentDTO.getTaxCode());
+        student.setRegistrationDate(LocalDate.now());
+        student.setEnrollments(new HashSet<>());
+        
         Student savedStudent = studentRepository.save(student);
         logger.debug("Student saved successfully with id: {}", savedStudent.getId());
         return savedStudent;

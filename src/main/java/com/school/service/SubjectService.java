@@ -3,10 +3,12 @@ package com.school.service;
 import com.school.model.Subject;
 import com.school.repository.SubjectRepository;
 import com.school.exception.ResourceNotFoundException;
+import com.school.exception.SubjectHasCoursesException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -45,15 +47,24 @@ public class SubjectService {
         return savedSubject;
     }
 
+    @Transactional
     public void deleteSubjectById(Long id) {
         logger.info("Attempting to delete subject with id: {}", id);
-        if (subjectRepository.existsById(id)) {
-            subjectRepository.deleteById(id);
-            logger.debug("Subject deleted successfully with id: {}", id);
-        } else {
-            logger.error("Failed to delete - subject not found with id: {}", id);
-            throw new ResourceNotFoundException("Subject", "id", id);
+        
+        Subject subject = subjectRepository.findById(id)
+            .orElseThrow(() -> {
+                logger.error("Failed to delete - subject not found with id: {}", id);
+                return new ResourceNotFoundException("Subject", "id", id);
+            });
+
+        if (!subject.getCourses().isEmpty()) {
+            int courseCount = subject.getCourses().size();
+            logger.error("Cannot delete subject with id {} - has {} associated courses", id, courseCount);
+            throw new SubjectHasCoursesException(id, courseCount);
         }
+
+        subjectRepository.deleteById(id);
+        logger.debug("Subject deleted successfully with id: {}", id);
     }
 
     public Subject updateSubject(Long id, Subject updatedSubject) {
@@ -68,7 +79,6 @@ public class SubjectService {
         Subject existingSubject = existingSubjectOptional.get();
         existingSubject.setName(updatedSubject.getName());
         existingSubject.setDescription(updatedSubject.getDescription());
-        existingSubject.setCourses(updatedSubject.getCourses());
 
         Subject savedSubject = subjectRepository.save(existingSubject);
         logger.debug("Subject updated successfully with id: {}", savedSubject.getId());
