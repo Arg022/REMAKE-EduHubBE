@@ -26,6 +26,10 @@ public class StudyPath {
     @NotBlank(message = "Description cannot be blank")
     private String description;
 
+    @NotNull(message = "Duration cannot be null")
+    @Min(value = 1, message = "Duration must be at least 1 year")
+    private Integer duration;
+
     @ManyToMany
     @JoinTable(
             name = "study_path_course",

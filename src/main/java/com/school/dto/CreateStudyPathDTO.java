@@ -13,6 +13,10 @@ public class CreateStudyPathDTO {
     @NotBlank(message = "Description cannot be blank")
     private String description;
 
+    @NotNull(message = "Duration cannot be null")
+    @Min(value = 1, message = "Duration must be at least 1 year")
+    private Integer duration;
+
     @NotEmpty(message = "At least one course must be assigned to the study path")
-    private Set<Long> courseIds;
+    private Set<Long> courses;
 }
