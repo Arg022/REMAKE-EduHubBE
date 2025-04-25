@@ -38,54 +38,62 @@ public class ScuolaApplication {
             Teacher teacher = new Teacher(null, teacherUser, "John", "Doe", "john.doe@example.com", "1234567890", "Mathematics", new HashSet<>());
             teacher = teacherRepository.save(teacher);
 
-            Subject subject = new Subject(null, "Mathematics", "Advanced Mathematics", new HashSet<>());
-            subject = subjectRepository.save(subject);
+            Subject mathSubject = new Subject(null, "Mathematics", "Advanced Mathematics", new HashSet<>());
+            mathSubject = subjectRepository.save(mathSubject);
+            
+            Subject physicsSubject = new Subject(null, "Physics", "General Physics", new HashSet<>());
+            physicsSubject = subjectRepository.save(physicsSubject);
 
-            StudyPath studyPath = new StudyPath(null, "Science Path", "Focus on science subjects", new HashSet<>());
-            studyPath = studyPathRepository.save(studyPath);
+            StudyPath sciencePath = new StudyPath(null, "Science Path", "Focus on science subjects", 3, new HashSet<>());
+            sciencePath = studyPathRepository.save(sciencePath);
+
+            Course algebraCourse = new Course(null, "Algebra 101", "Basic Algebra", 40,
+                    BigDecimal.valueOf(200), new HashSet<>(), new HashSet<>(),
+                    new HashSet<>(Set.of(mathSubject)), new HashSet<>(Set.of(sciencePath)));
+            algebraCourse = courseRepository.save(algebraCourse);
+
+            Course physicsCourse = new Course(null, "Physics 101", "Introduction to Physics", 40,
+                    BigDecimal.valueOf(200), new HashSet<>(), new HashSet<>(),
+                    new HashSet<>(Set.of(physicsSubject)), new HashSet<>(Set.of(sciencePath)));
+            physicsCourse = courseRepository.save(physicsCourse);
+
+            mathSubject.getCourses().add(algebraCourse);
+            subjectRepository.save(mathSubject);
+            
+            physicsSubject.getCourses().add(physicsCourse);
+            subjectRepository.save(physicsSubject);
 
             Student student = new Student(null, studentUser, "Jane", "Smith", LocalDate.of(2000, 1, 1),
                     "jane.smith@example.com", "0987654321", "123 Main St", "TAX123456",
                     LocalDate.now(), new HashSet<>());
             student = studentRepository.save(student);
 
-            Course course = new Course(null, "Algebra 101", "Basic Algebra", 40,
-                    BigDecimal.valueOf(200), new HashSet<>(), new HashSet<>(),
-                    new HashSet<>(Set.of(subject)), new HashSet<>(Set.of(studyPath)));
-            course = courseRepository.save(course);
-
-            subject.getCourses().add(course);
-            subjectRepository.save(subject);
-            
-            studyPath.getCourses().add(course);
-            studyPathRepository.save(studyPath);
 
             Classroom classroom = new Classroom(null, "Room A", 30, "Building 1", new HashSet<>());
             classroom = classroomRepository.save(classroom);
 
-            Lesson lesson = new Lesson(null, course, teacher, classroom,
+            Lesson algebraLesson = new Lesson(null, algebraCourse, teacher, classroom,
                     LocalDateTime.now(), LocalDateTime.now().plusHours(2));
-            lesson = lessonRepository.save(lesson);
+            algebraLesson = lessonRepository.save(algebraLesson);
 
-            course.getLessons().add(lesson);
-            courseRepository.save(course);
+            algebraCourse.getLessons().add(algebraLesson);
+            courseRepository.save(algebraCourse);
             
-            teacher.getLessons().add(lesson);
+            teacher.getLessons().add(algebraLesson);
             teacherRepository.save(teacher);
             
-            classroom.getLessons().add(lesson);
+            classroom.getLessons().add(algebraLesson);
             classroomRepository.save(classroom);
 
-
-            Enrollment enrollment = new Enrollment(null, student, course,
+            Enrollment enrollment = new Enrollment(null, student, algebraCourse,
                     LocalDate.now(), "Active", null);
             enrollment = enrollmentRepository.save(enrollment);
 
             student.getEnrollments().add(enrollment);
             studentRepository.save(student);
             
-            course.getEnrollments().add(enrollment);
-            courseRepository.save(course);
+            algebraCourse.getEnrollments().add(enrollment);
+            courseRepository.save(algebraCourse);
 
             Evaluation evaluation = new Evaluation(null, enrollment, 85,
                     LocalDate.now(), "Good performance");
